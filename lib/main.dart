@@ -22,6 +22,7 @@ class RandomSentences extends StatefulWidget {
 
 class _RandomSentecesState extends State<RandomSentences> {
   final _sentences = <String>[];
+  final _funnies = new Set<String>();
   final _biggerFont = const TextStyle(fontSize: 14.0);
 
   @override
@@ -29,6 +30,15 @@ class _RandomSentecesState extends State<RandomSentences> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Word Game"),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.list,
+              color: Colors.white,
+            ),
+            onPressed: _pushFunnies,
+          )
+        ],
       ),
       body: Center(
         child: _buildSenteces(),
@@ -37,12 +47,47 @@ class _RandomSentecesState extends State<RandomSentences> {
   }
 
   Widget _buildRow(String sentence) {
+    final alreadyFoundFunny = _funnies.contains(sentence);
+
     return ListTile(
       title: Text(
         sentence,
         style: _biggerFont,
       ),
+      trailing: Icon(
+        alreadyFoundFunny ? Icons.thumb_up : Icons.thumb_down,
+        color: alreadyFoundFunny ? Colors.green : null,
+      ),
+      onTap: () {
+        setState(() {
+          if (alreadyFoundFunny) {
+            _funnies.remove(sentence);
+          } else {
+            _funnies.add(sentence);
+          }
+        });
+      },
     );
+  }
+
+  void _pushFunnies() {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      final tiles = _funnies.map((sentence) {
+        return ListTile(
+          title: Text(sentence, style: _biggerFont),
+        );
+      });
+      final divided =
+          ListTile.divideTiles(context: context, tiles: tiles).toList();
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Saved Funny Senteces"),
+        ),
+        body: ListView(
+          children: divided,
+        ),
+      );
+    }));
   }
 
   String _getSentence() {
@@ -66,6 +111,7 @@ class _RandomSentecesState extends State<RandomSentences> {
           }
         }
         return _buildRow(_sentences[index]);
+        print(" test: ${index}");
       },
     );
   }
