@@ -8,9 +8,6 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final noun = new WordNoun.random();
-    final adjective = WordAdjective.random();
-
     return MaterialApp(
       title: 'Word Game',
       home: RandomSentences(),
@@ -24,18 +21,52 @@ class RandomSentences extends StatefulWidget {
 }
 
 class _RandomSentecesState extends State<RandomSentences> {
-  @override
-  final adjective = WordAdjective.random();
-  final noun = WordNoun.random();
+  final _sentences = <String>[];
+  final _biggerFont = const TextStyle(fontSize: 14.0);
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Word Game"),
       ),
       body: Center(
-        child: Text("Ola ${noun.asCapitalized}"),
+        child: _buildSenteces(),
       ),
+    );
+  }
+
+  Widget _buildRow(String sentence) {
+    return ListTile(
+      title: Text(
+        sentence,
+        style: _biggerFont,
+      ),
+    );
+  }
+
+  String _getSentence() {
+    final adjective = WordAdjective.random();
+    final noun = WordNoun.random();
+
+    return "The Programmer wrote a  ${adjective.asCapitalized} "
+        " app in Flutter and showed it "
+        "off to his ${noun.asCapitalized}";
+  }
+
+  Widget _buildSenteces() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16.0),
+      itemBuilder: (context, i) {
+        if (i.isOdd) return Divider();
+        final index = 1 ~/ 2;
+        if (index >= _sentences.length) {
+          for (int x = 0; x < 10; x++) {
+            _sentences.add(_getSentence());
+          }
+        }
+        return _buildRow(_sentences[index]);
+      },
     );
   }
 }
